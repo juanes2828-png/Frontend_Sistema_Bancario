@@ -1,0 +1,14 @@
+h1{
+    background-color: black;
+    color: greenyellow;
+    text-align: center;
+    padding: 15px;
+    border-radius: 10px;
+    transition: 0.5s ease;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 32px;
+}
+
+h1:hover{
+    font-size: 38px;
+}
