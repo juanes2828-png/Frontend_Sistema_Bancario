@@ -28,20 +28,29 @@ function Autenticacion(){
 //Función Registro de usuario
 function registro(){
     let identificacion=""
-    while (identificacion===null){
+    //while (identificacion===null){
         identificacion=Number(prompt("identificacion"))
-    }
+    //}
     
     const usuariosRegistrados = JSON.parse(localStorage.getItem("datosRegistro")) || [];
-    let usuarioDisponible=false
-    //let usuario=""
-     
-    //Aquí voy. Debemos hacer la validación
     
+    let buscarId=usuariosRegistrados.find(usuarioLocal => usuarioLocal.idAlmLocal===identificacion);
+    console.log(buscarId);
+    while(buscarId){
+        identificacion=Number(prompt("Ya existe un usuario con este número de identificación.\nInicia sesión."));
+        buscarId=usuariosRegistrados.find(usuarioLocal => usuarioLocal.idAlmLocal===identificacion);
+    }
+     
     let usuario=prompt("Usuario")
     while (usuario===null || usuario.trim()===""){
         usuario=prompt(`El campo no debe quedar vacío
             Escribe un nombre de usuario`)    
+    }
+
+    let buscarUsuario=usuariosRegistrados.find(usuarioLocal => usuarioLocal.usuarioAlmLocal===usuario);
+    while(buscarUsuario){
+        usuario=prompt("Ya existe un usuario registrado con ese nombre. Inténtalo de nuevo")
+        buscarUsuario=usuariosRegistrados.find(usuarioLocal => usuarioLocal.usuarioAlmLocal===usuario);
     }
 
     let correo=""
@@ -80,30 +89,43 @@ function registro(){
         correo:         ${ultimoRegistro.correoAlmLocal}
         contraseña:     ********`);
     
-        console.log("\nUsuario registrado con éxito. Vuelva e inicie sesión");
+        console.log("\nUsuario registrado con éxito. Regrese para iniciar sesión");
     Autenticacion()
+    
 }
 
 function iniciarSesion(){
-    datosCorrectos=false
     let contadorAccesoDenegado=0
-    while(datosCorrectos==false && contadorAccesoDenegado!=3){
-        const usuarioInicioSesion=prompt("Usuario");
-        const contrasenaInicioSesion=prompt("Contraseña")
-
-        datosGuardados=localStorage.getItem("datosRegistro");
-
-        const usuariosArray=JSON.parse(datosGuardados || "[]")
-        
-        datosCorrectos=usuariosArray.some(datosUsuario=>{
+    let usuarioInicioSesion=prompt("Usuario");
+    let contrasenaInicioSesion=prompt("Contraseña")
+    const directorioUsuarios=JSON.parse(localStorage.getItem("datosRegistro") || "[]")
+    
+    let datosCorrectos=directorioUsuarios.some(datosUsuario=>{
             return datosUsuario.usuarioAlmLocal===usuarioInicioSesion && datosUsuario.claveAlmLocal===contrasenaInicioSesion;
-            
+        })
+        if (datosCorrectos){
+            console.log("Acceso correcto");
+            Transacciones(usuarioInicioSesion)
+            return usuarioInicioSesion
+        }else{
+            console.log("Acceso denegado. Vuelva e intente.");
+            contadorAccesoDenegado++
+            if (contadorAccesoDenegado==3){
+                console.log("Cuenta bloqueada por 24 horas, comunícate con tu banco. Hasta pronto.");
+            }
+        }
+    while(datosCorrectos==false && contadorAccesoDenegado!=3){
+        //usuarioInicioSesion=prompt("Usuario incorrecto.\n Escribe nuevamente el usuario:");
+        contrasenaInicioSesion=prompt("Contraseña incorrecta. Inténtalo nuevamente:")
+    let datosCorrectos=directorioUsuarios.some(datosUsuario=>{
+            return datosUsuario.usuarioAlmLocal===usuarioInicioSesion && datosUsuario.claveAlmLocal===contrasenaInicioSesion;
         })
         
     if (datosCorrectos){
             console.log("Acceso correcto");
             Transacciones(usuarioInicioSesion)
             return usuarioInicioSesion
+            
             
         }else{
             console.log("Acceso denegado. Vuelva e intente.");
@@ -122,13 +144,14 @@ function Transacciones(usuarioActivo){
         3. Consignar
         4. Consultar movimientos
         5. Transferencia entre usuarios
-        6. Salir`))
+        6. Regresar al inicio
+        7. Salir`))
     switch(consultasYMovimientos){
         case 1: 
             RetirarDinero();
             break;
         case 2: 
-            ConsultarSaldo();
+            ConsultarSaldo(usuarioActivo);
             break;
         case 3: 
             Consignar(usuarioActivo);
@@ -140,15 +163,57 @@ function Transacciones(usuarioActivo){
             TransferenciaEntreUsuarios();
             break;
         case 6:
+            console.log("Regresar al inicio");
+            Autenticacion()
+            break;
+        case 7:
             console.log("Hasta pronto.");
             break;
+        
         default:
             console.log("No seleccionó una opción válida");
     }
 }
 
+
+
+function RetirarDinero(usuarioActivo){
+    //solicitar el valor retirar y se valida que sea mayor a cero
+    let valorARetirar=Number(prompt("Digite el valor a retirar:"))
+    while (valorARetirar<=0){
+        valorARetirar=Number(prompt(`Debe diligenciar un valor positivo.
+        Digite nuevamente el valor a retirar`))
+    }
+    let directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
+    
+    //terminar esta parte
+}
+
+function guardarUsuario(){
+    const usuarioLogueado=iniciarSesion();
+    if (usuarioLogueado){
+        ConsultarSaldo(usuarioLogueado)
+    }
+}
+
+function ConsultarSaldo(usuarioActivo){
+    const usuarioInicioSesion=usuarioActivo
+    let saldo=0;
+    console.log(usuarioActivo);
+    const directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
+    for (let objeto of directorioTransacciones){
+        if (objeto.usuarioTransaccion===usuarioActivo){
+            saldo=saldo+objeto.valor
+        }
+        
+    }
+    console.log(saldo);
+}
+
 function Consignar(usuarioActivo){
+    
     //solicitar el valor consignar y se valida que sea mayor a cero
+    const usuarioInicioSesion=usuarioActivo
     let valorAConsignar=Number(prompt("Digite el valor a consignar:"))
     while (valorAConsignar<=0){
         valorAConsignar=Number(prompt(`Debe diligenciar un valor positivo.
@@ -157,9 +222,9 @@ function Consignar(usuarioActivo){
     
     
     const transaccion={
-        usuarioConsignacion: usuarioActivo,
+        usuarioTransaccion: usuarioActivo,
         tipoTransaccion:"Consignación",
-        valorConsignado: valorAConsignar,
+        valor: valorAConsignar,
         fechaTransaccion: new Date()
     }
 
@@ -169,8 +234,17 @@ function Consignar(usuarioActivo){
 
     console.log(`Resumen de la transacción:
         Tipo de transacción: ${transaccion.tipoTransaccion}
-        Valor consignado:    ${transaccion.valorConsignado.toLocaleString("en-US")}
+        Valor consignado:    ${transaccion.valor.toLocaleString("en-US")}
         fecha de transacción ${transaccion.fechaTransaccion}
         `);
     Transacciones()
+    return usuarioInicioSesion
+}
+
+function ConsultarMovimientos(usuarioActivo){
+
+}
+
+function TransferenciaEntreUsuarios(){
+
 }
