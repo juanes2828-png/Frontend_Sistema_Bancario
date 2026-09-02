@@ -124,7 +124,7 @@ function iniciarSesion(){
     if (datosCorrectos){
             console.log("Acceso correcto");
             Transacciones(usuarioInicioSesion)
-            return usuarioInicioSesion
+            //return usuarioInicioSesion
             
             
         }else{
@@ -138,53 +138,81 @@ function iniciarSesion(){
 }
 
 function Transacciones(usuarioActivo){
-    const consultasYMovimientos=Number(prompt(`Consultas y movimientos:
-        1. RetirarDinero
+    let cerrarSesion=false
+    while(!cerrarSesion){
+        const consultasYMovimientos=Number(prompt(`Consultas y movimientos:
+        1. Retirar Dinero
         2. Consultar saldo
         3. Consignar
         4. Consultar movimientos
         5. Transferencia entre usuarios
         6. Regresar al inicio
         7. Salir`))
-    switch(consultasYMovimientos){
-        case 1: 
-            RetirarDinero();
-            break;
-        case 2: 
-            ConsultarSaldo(usuarioActivo);
-            break;
-        case 3: 
-            Consignar(usuarioActivo);
-            break;
-        case 4: 
-            ConsultarMovimientos();
-            break;
-        case 5: 
-            TransferenciaEntreUsuarios();
-            break;
-        case 6:
-            console.log("Regresar al inicio");
-            Autenticacion()
-            break;
-        case 7:
-            console.log("Hasta pronto.");
-            break;
-        
-        default:
-            console.log("No seleccionó una opción válida");
+        switch(consultasYMovimientos){
+            case 1: 
+                RetirarDinero(usuarioActivo);
+                break;
+            case 2: 
+                ConsultarSaldo(usuarioActivo);
+                break;
+            case 3: 
+                Consignar(usuarioActivo);
+                break;
+            case 4: 
+                ConsultarMovimientos(usuarioActivo);
+                break;
+            case 5: 
+                TransferenciaEntreUsuarios(usuarioActivo);
+                break;
+            case 6:
+                console.log("Regresar al inicio");
+                Autenticacion()
+                break;
+            case 7:
+                console.log("Sesión cerrada correctamente. Hasta pronto.");
+                cerrarSesion=true
+
+                break;
+
+            default:
+                console.log("No seleccionó una opción válida");
+        }
+    
     }
 }
 
 
 
 function RetirarDinero(usuarioActivo){
+    const usuarioInicioSesion=usuarioActivo
     //solicitar el valor retirar y se valida que sea mayor a cero
     let valorARetirar=Number(prompt("Digite el valor a retirar:"))
     while (valorARetirar<=0){
         valorARetirar=Number(prompt(`Debe diligenciar un valor positivo.
         Digite nuevamente el valor a retirar`))
     }
-    let directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
+    let saldo=ConsultarSaldo(usuarioInicioSesion);
+    if (saldo<valorARetirar){
+        console.log("No tiene saldo disponible");
+    } else{
+        
+        const transaccion={
+        usuarioTransaccion: usuarioInicioSesion,
+        tipoTransaccion:"Retiro",
+        valor: -valorARetirar,
+        fechaTransaccion: new Date()
+    }
+    console.log(`Transacción exitosa. Resumen de la transacción:
+        Usuario:              ${usuarioActivo}
+        Tipo de transacción:  "Retiro"
+        Valor retirado:       ${valorARetirar.toLocaleString("en-US")}
+        Fecha de transacción: ${transaccion.fechaTransaccion}`)
+
+        const directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
+        directorioTransacciones.push(transaccion);
+        localStorage.setItem("TransaccionesRegistro",JSON.stringify(directorioTransacciones))    
+    }
+    //let directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
     
     //terminar esta parte
 }
@@ -197,17 +225,16 @@ function guardarUsuario(){
 }
 
 function ConsultarSaldo(usuarioActivo){
-    const usuarioInicioSesion=usuarioActivo
+    
     let saldo=0;
-    console.log(usuarioActivo);
     const directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
     for (let objeto of directorioTransacciones){
         if (objeto.usuarioTransaccion===usuarioActivo){
             saldo=saldo+objeto.valor
         }
-        
     }
-    console.log(saldo);
+    console.log(`Saldo actual: ${saldo.toLocaleString("en-US")}`);
+    return saldo;
 }
 
 function Consignar(usuarioActivo){
@@ -222,7 +249,7 @@ function Consignar(usuarioActivo){
     
     
     const transaccion={
-        usuarioTransaccion: usuarioActivo,
+        usuarioTransaccion: usuarioInicioSesion,
         tipoTransaccion:"Consignación",
         valor: valorAConsignar,
         fechaTransaccion: new Date()
@@ -237,8 +264,8 @@ function Consignar(usuarioActivo){
         Valor consignado:    ${transaccion.valor.toLocaleString("en-US")}
         fecha de transacción ${transaccion.fechaTransaccion}
         `);
-    Transacciones()
-    return usuarioInicioSesion
+    Transacciones(usuarioInicioSesion)
+    
 }
 
 function ConsultarMovimientos(usuarioActivo){
