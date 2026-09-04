@@ -10,6 +10,7 @@ function Autenticacion(){
         seleccionInicioSesion=Number(prompt("No ha seleccionado una opción válida:\n1. Iniciar sesión\n2. Registrarse\n3. Salir"));    
     }
 
+    // Seleccionar si quiere iniciar sesión, registrarse o salir
     switch(seleccionInicioSesion){
         case 1:
             iniciarSesion();
@@ -27,12 +28,13 @@ function Autenticacion(){
 //Función Registro de usuario
 function registro(){
     let identificacion=""
-    //while (identificacion===null){
-        identificacion=Number(prompt("identificacion"))
-    //}
     
+        identificacion=Number(prompt("identificacion"))
+    
+    //Consultar la base de datos de los usuarios
     const usuariosRegistrados = JSON.parse(localStorage.getItem("datosRegistro")) || [];
     
+    //Valida si la identificación del usuario ya existe y solicita ingresar nuevamente la información
     let buscarId=usuariosRegistrados.find(usuarioLocal => usuarioLocal.idAlmLocal===identificacion);
     console.log(buscarId);
     while(buscarId){
@@ -45,7 +47,7 @@ function registro(){
         usuario=prompt(`El campo no debe quedar vacío
             Escribe un nombre de usuario`)    
     }
-
+    // valida si el nombre de usuario ya existe y solicita ingrear la información nuevamente
     let buscarUsuario=usuariosRegistrados.find(usuarioLocal => usuarioLocal.usuarioAlmLocal===usuario);
     while(buscarUsuario){
         usuario=prompt("Ya existe un usuario registrado con ese nombre. Inténtalo de nuevo")
@@ -57,15 +59,19 @@ function registro(){
         correo=prompt("Correo");
     }
     let clave=prompt("Digite una clave. Debe tener entre 8 y 16 caracteres");
+    
+    //Valida que la clave tenga entre 8 y 16 caracteres. Si no, repite el proceso
     while(clave.length<8 || clave.length>16){
         clave=prompt("No cumpliste con los requisitos para crear la clave. \nDigite nuevamente clave. Debe tener entre 8 y 16 caracteres");
     }
     let repetirClave=prompt("Repita la clave:");
+    
+    //Valida que las dos claves coincidan
     while(clave!=repetirClave){
         repetirClave=prompt("La clave no coincide con la anterior. Vuelva a intentarlo")
     }
 
-    //almacenamiento local
+    //Crea el objeto datosUsuario para almacenar en el arreglo datosRegistro
     const datosUsuario={
         idAlmLocal:identificacion,
         usuarioAlmLocal:usuario,
@@ -74,11 +80,13 @@ function registro(){
 
     }
 
+    //Busca el arreglo, pega el objeto al arreglo y lo actualiza
     let directorioUsuarios=JSON.parse(localStorage.getItem("datosRegistro")) || [];
     directorioUsuarios.push(datosUsuario);
     localStorage.setItem("datosRegistro",JSON.stringify(directorioUsuarios))
 
     let recuperado=JSON.parse(localStorage.getItem("datosRegistro"))
+    //Muestra el último registro almacenado
     let ultimoRegistro=recuperado.at(-1)
 
     
@@ -93,9 +101,12 @@ function registro(){
     
 }
 
+
 function iniciarSesion(){
     let contadorAccesoDenegado=0
     let usuarioInicioSesion=prompt("Usuario");
+    
+    //Se llama la base de datos local
     const directorioUsuarios=JSON.parse(localStorage.getItem("datosRegistro") || "[]")
     /* let usuarioCorrecto=directorioUsuarios.some(usuarioObjeto=>{
         return usuarioObjeto.usuarioAlmLocal===usuarioInicioSesion
@@ -106,6 +117,8 @@ function iniciarSesion(){
         Autenticacion();
     } */
     let contrasenaInicioSesion=prompt("Contraseña")
+    
+    //Validación el el nombre de usuario exista y que coincida con la clave
     let datosCorrectos=directorioUsuarios.some(datosUsuario=>{
             return datosUsuario.usuarioAlmLocal===usuarioInicioSesion && datosUsuario.claveAlmLocal===contrasenaInicioSesion;
         })
@@ -120,8 +133,8 @@ function iniciarSesion(){
                 console.log("Cuenta bloqueada por 24 horas, comunícate con tu banco. Hasta pronto.");
             }
         }
-    while(datosCorrectos==false && contadorAccesoDenegado!=3){
-        //usuarioInicioSesion=prompt("Usuario incorrecto.\n Escribe nuevamente el usuario:");
+        //
+        while(datosCorrectos==false && contadorAccesoDenegado!=3){
         contrasenaInicioSesion=prompt(`Contraseña incorrecta. Inténtalo nuevamente. (Intentos restantes ${3-contadorAccesoDenegado})`)
     let datosCorrectos=directorioUsuarios.some(datosUsuario=>{
             return datosUsuario.usuarioAlmLocal===usuarioInicioSesion && datosUsuario.claveAlmLocal===contrasenaInicioSesion;
@@ -130,7 +143,6 @@ function iniciarSesion(){
     if (datosCorrectos){
             console.log("Acceso correcto");
             Transacciones(usuarioInicioSesion)
-            //return usuarioInicioSesion
             
             
         }else{
