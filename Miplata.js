@@ -1,9 +1,9 @@
-Autenticacion()
+Autenticacion();
 
 function Autenticacion(){
-    console.log("<--| REGISTRO Y AUTENTICACIÓN |-->");
+    console.log("--- REGISTRO Y AUTENTICACIÓN ---");
 
-    let seleccionInicioSesion=Number(prompt("<--<< Inicio de Sesión >>-->\n1. Iniciar sesión \n2. Registrarse\n3. Salir"));
+    let seleccionInicioSesion=Number(prompt("<---- Inicio de Sesión ---->\n1. Iniciar sesión \n2. Registrarse\n3. Salir"));
 
     //Validación ingreso. Debe seleccionar 1 o 2 hasta que se canse
     while (seleccionInicioSesion<1 || seleccionInicioSesion>3){
@@ -27,9 +27,8 @@ function Autenticacion(){
 
 //Función Registro de usuario
 function registro(){
-    let identificacion=""
-    
-        identificacion=Number(prompt("identificacion"))
+    let identificacion="";
+    identificacion=Number(prompt("identificacion"));
     
     //Consultar la base de datos de los usuarios
     const usuariosRegistrados = JSON.parse(localStorage.getItem("datosRegistro")) || [];
@@ -42,22 +41,22 @@ function registro(){
         buscarId=usuariosRegistrados.find(usuarioLocal => usuarioLocal.idAlmLocal===identificacion);
     }
      
-    let usuario=prompt("Usuario")
+    let usuario=prompt("Usuario");
     while (usuario===null || usuario.trim()===""){
         usuario=prompt(`El campo no debe quedar vacío
             Escribe un nombre de usuario`)    
-    }
+    };
     // valida si el nombre de usuario ya existe y solicita ingrear la información nuevamente
     let buscarUsuario=usuariosRegistrados.find(usuarioLocal => usuarioLocal.usuarioAlmLocal===usuario);
     while(buscarUsuario){
         usuario=prompt("Ya existe un usuario registrado con ese nombre. Inténtalo de nuevo")
         buscarUsuario=usuariosRegistrados.find(usuarioLocal => usuarioLocal.usuarioAlmLocal===usuario);
-    }
+    };
 
     let correo=""
     while (correo===null || correo.trim()===""){
         correo=prompt("Correo");
-    }
+    };
     let clave=prompt("Digite una clave. Debe tener entre 8 y 16 caracteres");
     
     //Valida que la clave tenga entre 8 y 16 caracteres. Si no, repite el proceso
@@ -69,7 +68,7 @@ function registro(){
     //Valida que las dos claves coincidan
     while(clave!=repetirClave){
         repetirClave=prompt("La clave no coincide con la anterior. Vuelva a intentarlo")
-    }
+    };
 
     //Crea el objeto datosUsuario para almacenar en el arreglo datosRegistro
     const datosUsuario={
@@ -78,16 +77,16 @@ function registro(){
         correoAlmLocal: correo,
         claveAlmLocal: clave,
 
-    }
+    };
 
     //Busca el arreglo, pega el objeto al arreglo y lo actualiza
     let directorioUsuarios=JSON.parse(localStorage.getItem("datosRegistro")) || [];
     directorioUsuarios.push(datosUsuario);
-    localStorage.setItem("datosRegistro",JSON.stringify(directorioUsuarios))
+    localStorage.setItem("datosRegistro",JSON.stringify(directorioUsuarios));
 
-    let recuperado=JSON.parse(localStorage.getItem("datosRegistro"))
+    let recuperado=JSON.parse(localStorage.getItem("datosRegistro"));
     //Muestra el último registro almacenado
-    let ultimoRegistro=recuperado.at(-1)
+    let ultimoRegistro=recuperado.at(-1);
 
     
     console.log(`Se ha registrado el siguiente usuario:
@@ -97,17 +96,16 @@ function registro(){
         contraseña:     ********`);
     
         console.log("\nUsuario registrado con éxito. Regrese para iniciar sesión");
-    Autenticacion()
-    
-}
+    Autenticacion();
+};
 
 
 function iniciarSesion(){
-    let contadorAccesoDenegado=0
+    let contadorAccesoDenegado=0;
     let usuarioInicioSesion=prompt("Usuario");
     
     //Se llama la base de datos local
-    const directorioUsuarios=JSON.parse(localStorage.getItem("datosRegistro") || "[]")
+    const directorioUsuarios=JSON.parse(localStorage.getItem("datosRegistro") || "[]");
     /* let usuarioCorrecto=directorioUsuarios.some(usuarioObjeto=>{
         return usuarioObjeto.usuarioAlmLocal===usuarioInicioSesion
     })
@@ -116,12 +114,12 @@ function iniciarSesion(){
         usuarioCorrecto=true;
         Autenticacion();
     } */
-    let contrasenaInicioSesion=prompt("Contraseña")
+    let contrasenaInicioSesion=prompt("Contraseña");
     
     //Validación el el nombre de usuario exista y que coincida con la clave
     let datosCorrectos=directorioUsuarios.some(datosUsuario=>{
-            return datosUsuario.usuarioAlmLocal===usuarioInicioSesion && datosUsuario.claveAlmLocal===contrasenaInicioSesion;
-        })
+        return datosUsuario.usuarioAlmLocal===usuarioInicioSesion && datosUsuario.claveAlmLocal===contrasenaInicioSesion;
+        });
         if (datosCorrectos){
             console.log("Acceso correcto");
             Transacciones(usuarioInicioSesion)
@@ -132,19 +130,16 @@ function iniciarSesion(){
             if (contadorAccesoDenegado==3){
                 console.log("Cuenta bloqueada por 24 horas, comunícate con tu banco. Hasta pronto.");
             }
-        }
+        };
         //
         while(datosCorrectos==false && contadorAccesoDenegado!=3){
-        contrasenaInicioSesion=prompt(`Contraseña incorrecta. Inténtalo nuevamente. (Intentos restantes ${3-contadorAccesoDenegado})`)
-    let datosCorrectos=directorioUsuarios.some(datosUsuario=>{
+            contrasenaInicioSesion=prompt(`Contraseña incorrecta. Inténtalo nuevamente. (Intentos restantes ${3-contadorAccesoDenegado})`)
+            let datosCorrectos=directorioUsuarios.some(datosUsuario=>{
             return datosUsuario.usuarioAlmLocal===usuarioInicioSesion && datosUsuario.claveAlmLocal===contrasenaInicioSesion;
         })
-        
-    if (datosCorrectos){
+        if (datosCorrectos){
             console.log("Acceso correcto");
-            Transacciones(usuarioInicioSesion)
-            
-            
+            Transacciones(usuarioInicioSesion);
         }else{
             console.log("Acceso denegado. Vuelva e intente.");
             contadorAccesoDenegado++
@@ -156,7 +151,7 @@ function iniciarSesion(){
 }
 
 function Transacciones(usuarioActivo){
-    let cerrarSesion=false
+    let cerrarSesion=false;
     while(!cerrarSesion){
         const consultasYMovimientos=Number(prompt(`Consultas y movimientos:
         1. Retirar Dinero
@@ -165,7 +160,7 @@ function Transacciones(usuarioActivo){
         4. Consultar movimientos
         5. Transferencia entre usuarios
         6. Regresar al inicio
-        7. Salir`))
+        7. Salir`));
         switch(consultasYMovimientos){
             case 1: 
                 RetirarDinero(usuarioActivo);
@@ -202,44 +197,45 @@ function Transacciones(usuarioActivo){
 
 
 function RetirarDinero(usuarioActivo){
-    const usuarioInicioSesion=usuarioActivo
+    const usuarioInicioSesion=usuarioActivo;
     //solicitar el valor retirar y se valida que sea mayor a cero
-    let valorARetirar=Number(prompt("Digite el valor a retirar:"))
+    let valorARetirar=Number(prompt("Digite el valor a retirar:"));
     while (valorARetirar<=0){
         valorARetirar=Number(prompt(`Debe diligenciar un valor positivo.
         Digite nuevamente el valor a retirar`))
-    }
+    };
     let saldo=ConsultarSaldo(usuarioInicioSesion);
     if (saldo<valorARetirar){
         console.log("No tiene saldo disponible");
     } else{
-        
+    
+    //Crear el objeto con la información del retiro
     const transaccion={
         usuarioTransaccion: usuarioInicioSesion,
         tipoTransaccion:"Retiro",
         valor: -valorARetirar,
         fechaTransaccion: new Date()
-    }
+    };
     
+    //Llamar el array almacenado en local storage, cargar el objeto y volver subirlo
     const directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
         directorioTransacciones.push(transaccion);
-        localStorage.setItem("TransaccionesRegistro",JSON.stringify(directorioTransacciones))
+        localStorage.setItem("TransaccionesRegistro",JSON.stringify(directorioTransacciones));
     
     let nuevoSaldo=ConsultarSaldo(usuarioActivo);
 
+    //Mostrar en pantalla el resumen de la transacción
     console.log(`Transacción exitosa. Resumen de la transacción:
         Usuario:              ${usuarioActivo}
         Tipo de transacción:  "Retiro"
         Valor retirado:       ${valorARetirar.toLocaleString("en-US")}
         Fecha de transacción: ${transaccion.fechaTransaccion}
         Nuevo saldo:          ${(nuevoSaldo).toLocaleString("en-US")}`)
-
-            
-    }
+    };
 }
 
+//Función para consultar saldo y utilizarlo en las demás funciones cuando se solicite
 function ConsultarSaldo(usuarioActivo){
-    
     let saldo=0;
     const directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
     for (let objeto of directorioTransacciones){
@@ -248,50 +244,54 @@ function ConsultarSaldo(usuarioActivo){
         }
     }
     return saldo;
-}
+};
 
+//Función específica para mostrar el saldo en pantalla
 function MostrarSaldo(usuarioActivo){
     let saldo=ConsultarSaldo(usuarioActivo);
     console.log(`Saldo actual: ${saldo.toLocaleString("en-US")}`);
-}
+};
 
 function Consignar(usuarioActivo){
     
     //solicitar el valor consignar y se valida que sea mayor a cero
-    const usuarioInicioSesion=usuarioActivo
-    let valorAConsignar=Number(prompt("Digite el valor a consignar:"))
+    const usuarioInicioSesion=usuarioActivo;
+    let valorAConsignar=Number(prompt("Digite el valor a consignar:"));
     while (valorAConsignar<=0){
         valorAConsignar=Number(prompt(`Debe diligenciar un valor positivo.
         Digite nuevamente el valor a consignar`))
-    }
+    };
     
-    
+    //Crear el objeto con la información de la consignación
     const transaccion={
         usuarioTransaccion: usuarioInicioSesion,
         tipoTransaccion:"Consignación",
         valor: valorAConsignar,
         fechaTransaccion: new Date()
-    }
+    };
 
+    //Llamar el array almacenado en local storage, cargar el objeto y volver subirlo
     let directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
     directorioTransacciones.push(transaccion);
-    localStorage.setItem("TransaccionesRegistro",JSON.stringify(directorioTransacciones))
+    localStorage.setItem("TransaccionesRegistro",JSON.stringify(directorioTransacciones));
 
-    let saldo = ConsultarSaldo(usuarioActivo)
+    let saldo = ConsultarSaldo(usuarioActivo);
     
+    //Mostrar el resumen de la transacción en consola
     console.log(`Resumen de la transacción:
         Tipo de transacción: ${transaccion.tipoTransaccion}
         Valor consignado:    ${transaccion.valor.toLocaleString("en-US")}
         Fecha de transacción:${transaccion.fechaTransaccion}
-        Nuevo saldo:         ${saldo.toLocaleString("en-US")}`);
-    Transacciones(usuarioInicioSesion)
-    
+        Nuevo saldo:         ${saldo.toLocaleString("en-US")}`
+    );
 }
 
 function ConsultarMovimientos(usuarioActivo){
     let directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
     let saldo=0
     console.log("-----Informe de transacciones realizadas-----");
+    
+    //Primero se crea un objeto con la constante valoresFiltrados comparándolo con la variable usuarioActivo. Luego se muestra con el forEach
     const valoresFiltrados=directorioTransacciones.filter(transaccion=>transaccion.usuarioTransaccion===usuarioActivo)
     valoresFiltrados.forEach(transaccion => {
         console.log(`Fecha: ${transaccion.fechaTransaccion} | Tipo: ${transaccion.tipoTransaccion} | Valor: ${transaccion.valor.toLocaleString("en-US")} | Saldo: ${(saldo=saldo+transaccion.valor).toLocaleString("en-US")}`);    
@@ -300,9 +300,10 @@ function ConsultarMovimientos(usuarioActivo){
 }
 
 function TransferenciaEntreUsuarios(usuarioActivo){
+    //Llamar el arreglo con los usuarios para validar si el usuario al que se le va a transferir si existe en la base de datos. Además se valida que no se vaya a transferir así mismo
     let directorioUsuarios=JSON.parse(localStorage.getItem("datosRegistro")) || [];
     const valorATransferir=Number(prompt("Digite el valor a transferir:"));
-    let saldo=ConsultarSaldo(usuarioActivo)
+    let saldo=ConsultarSaldo(usuarioActivo);
     if(valorATransferir>saldo){
         console.log("No cuenta con saldo suficiente para realizar la transferencia");
 
@@ -317,31 +318,36 @@ function TransferenciaEntreUsuarios(usuarioActivo){
             return usuarioObjeto.usuarioAlmLocal===usuarioATransferir && usuarioObjeto.usuarioAlmLocal!=usuarioActivo
             })
         }    
-            const transferOrigen={
-                usuarioTransaccion:usuarioActivo,
-                tipoTransaccion:"Transferencia",
-                valor:-valorATransferir,
-                fechaTransaccion: new Date()
-            };
+        
+        //Crear el objeto con los datos de la transferencia del usuario que va a enviar el dinero
+        const transferOrigen={
+            usuarioTransaccion:usuarioActivo,
+            tipoTransaccion:"Transferencia",
+            valor:-valorATransferir,
+            fechaTransaccion: new Date()
+        };
+        //Se llama el arreglo de las transacciones para almacenar el objeto creado con la transacción
+            let directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
+        directorioTransacciones.push(transferOrigen);
+        localStorage.setItem("TransaccionesRegistro",JSON.stringify(directorioTransacciones))
+        //Se vuelve a llamar el arreglo de las transacción pero ya con la transacción del origen guardada.
+        directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
+        const transferDestino={
+            usuarioTransaccion:usuarioATransferir,
+            tipoTransaccion:"Transferencia",
+            valor:valorATransferir,
+            fechaTransaccion: new Date()
             
-             let directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
-            directorioTransacciones.push(transferOrigen);
-            localStorage.setItem("TransaccionesRegistro",JSON.stringify(directorioTransacciones))
-            directorioTransacciones=JSON.parse(localStorage.getItem("TransaccionesRegistro")) || [];
-            const transferDestino={
-                usuarioTransaccion:usuarioATransferir,
-                tipoTransaccion:"Transferencia",
-                valor:valorATransferir,
-                fechaTransaccion: new Date()
-                
-            }
-            directorioTransacciones.push(transferDestino);
-            localStorage.setItem("TransaccionesRegistro",JSON.stringify(directorioTransacciones))
-            console.log(`-----Resumen de la transacción-----
-                Tipo de transacción:  Transferencia
-                Valor:                ${valorATransferir.toLocaleString("en-US")}
-                Usuario destino:      ${usuarioATransferir}
-                Nuevo saldo:          ${(ConsultarSaldo(usuarioActivo)).toLocaleString("en-US")}
-                Fecha de transacción: ${new Date()}`);
+        }
+        //Se almacena el objeto de la transacción de destino en el arreglo existente
+        directorioTransacciones.push(transferDestino);
+        localStorage.setItem("TransaccionesRegistro",JSON.stringify(directorioTransacciones))
+        //Se muestra en consola el resumen de la transacción con la información de toda la transacción
+        console.log(`-----Resumen de la transacción-----
+            Tipo de transacción:  Transferencia
+            Valor:                ${valorATransferir.toLocaleString("en-US")}
+            Usuario destino:      ${usuarioATransferir}
+            Nuevo saldo:          ${(ConsultarSaldo(usuarioActivo)).toLocaleString("en-US")}
+            Fecha de transacción: ${new Date()}`);
     }
 }
